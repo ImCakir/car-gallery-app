@@ -1,5 +1,6 @@
 package com.caglacakir.config;
 
+import com.caglacakir.handler.AuthEntryPoint;
 import com.caglacakir.jwt.JWTAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -26,6 +27,9 @@ public class SecurityConfig {
     @Autowired
     private JWTAuthenticationFilter jwtAuthenticationFilter;
 
+    @Autowired
+    private AuthEntryPoint authEntryPoint;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -34,6 +38,7 @@ public class SecurityConfig {
                         .requestMatchers(REGISTER, AUTHENTICATE, REFRESH_TOKEN).permitAll()
                         .anyRequest().authenticated()
                 )
+                .exceptionHandling(exception ->  exception.authenticationEntryPoint(authEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
